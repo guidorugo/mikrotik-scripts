@@ -1,0 +1,39 @@
+:log info "Setting up local variables"
+
+:local months ("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+
+:local ts [/system clock get time]
+
+:set ts ([:pick $ts 0 2].[:pick $ts 3 5].[:pick $ts 6 8])
+
+:local ds [/system clock get date]
+
+:local month [ :pick $ds 0 3 ];
+
+:local mm ([ :find $months $month -1 ] + 1);
+
+:if ($mm < 10) do={ :set mm ("0" . $mm); }
+
+:set ds ([:pick $ds 7 11] . $mm . [:pick $ds 4 6])
+
+:put ("Backup name is " . $ds . ".backup")
+
+:local cuenta "<source mail>"
+
+# IP address 173.194.77.108 is gmail for send mail
+
+/tool e-mail set address=173.194.77.108 port=587 from=$cuenta user=$cuenta password=<not this time, buddy> start-tls=yes 
+
+:log info "Generating backup file"
+
+/system backup save name=$ds
+
+#Delay to give time to generate the backup
+
+:delay 5s
+
+:log info "Sending e-mail"
+
+/tool e-mail send file=($ds . ".backup") to="<recipment1>" body=("Backup file attached from " . $nombre . ", date " . $dia . ", time " . $hora) subject=($ds . " Backup")
+
+/tool e-mail send file=($ds . ".backup") to="<recipment2>" body=("Backup file attached from " . $nombre . ", date " . $dia . ", time " . $hora) subject=($ds . " Backup")
