@@ -1,0 +1,11 @@
+/ip dhcp-server lease
+	
+	:foreach x in=[find] do={
+	
+		:local target  [get $x address]
+		
+		:local hostName [get $x host-name]
+		
+		/queue simple add name=("rule" . $target) target=$target dst=V-Fibra max-limit=5M/5M comment=$hostName 
+	
+		}
